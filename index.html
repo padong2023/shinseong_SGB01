@@ -97,7 +97,7 @@
   
   <h3>처리 범위</h3>
   <input type="number" id="startRow" placeholder="시작 행" value="2" class="input-field">
-  <input type="number" id="endRow" placeholder="끝 행 (비워두면 마지막 행까지)" class="input-field">
+  <input type="number" id="endRow" placeholder="끝 행 (학생수 + 1)" class="input-field">
   
   <h3>시스템 프롬프트</h3>
   <input type="text" id="systemPromptInput" placeholder="시스템 프롬프트 입력" class="input-field">
@@ -125,8 +125,7 @@
   <input type="text" id="newColumnDescription" placeholder="새 열 설명 (예: 감상과 깨달은 점)" class="input-field">
   <button class="button" onclick="addColumn()">열 추가</button>
   
-  <textarea id="userPromptTemplate" rows="4" placeholder="사용자 프롬프트 템플릿 입력 (예: ${columnC}:  ${bookInfo}...)" class="input-area"></textarea>
-  <button class="button" onclick="addUserPrompt()">추가</button>
+  <button class="button" onclick="generateTemplate()">프롬프트 템플릿 생성</button>
   <div id="userPromptList" class="prompt-list"></div>
   
   <button class="button" onclick="startProcess()">처리 시작</button>

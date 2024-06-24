@@ -15,24 +15,26 @@ function addSystemPrompt() {
   }
 }
 
-function addUserPrompt() {
-  const template = document.getElementById('userPromptTemplate').value;
-  if (template.trim() !== '') {
-    const userPrompt = {
-      template: template,
-      columnDescriptions: { ...columnDescriptions }
-    };
-    userPrompts.push(userPrompt);
-    updatePromptList('userPromptList', userPrompts);
-    document.getElementById('userPromptTemplate').value = '';
-  }
+function generateTemplate() {
+  const templateParts = Object.keys(columnDescriptions).map(key => {
+    return `${columnDescriptions[key]}: \${${key}}`;
+  });
+
+  const template = templateParts.join('\n');
+  const userPrompt = {
+    template: template,
+    columnDescriptions: { ...columnDescriptions }
+  };
+
+  userPrompts.push(userPrompt);
+  updatePromptList('userPromptList', userPrompts);
 }
 
 function updatePromptList(listId, prompts) {
   const list = document.getElementById(listId);
   if (listId === 'userPromptList') {
     list.innerHTML = prompts.map((prompt, index) => 
-      `<div class="prompt-item">템플릿: ${prompt.template}<br>열 설명: ${JSON.stringify(prompt.columnDescriptions)} <button class="button" style="background-color: #e74c3c;" onclick="removePrompt('${listId}', ${index})">삭제</button></div>`
+      `<div class="prompt-item">템플릿: <pre>${prompt.template}</pre> <button class="button" style="background-color: #e74c3c;" onclick="removePrompt('${listId}', ${index})">삭제</button></div>`
     ).join('');
   } else if (listId === 'systemPromptList') {
     list.innerHTML = prompts.map((prompt, index) => 
@@ -91,10 +93,13 @@ function startProcess() {
   document.getElementById('progressBar').style.display = 'block';
   document.getElementById('status').innerHTML = '처리 중...';
   
-  // google.script.run is specific to Google Apps Script environment and won't work on GitHub Pages.
-  // This needs to be adapted to use a relevant server-side script or API endpoint.
-  // For demonstration purposes, the following is a placeholder for actual processing logic.
+  // Google Apps Script와 연동하는 부분
+  // google.script.run
+  //   .withSuccessHandler(onSuccess)
+  //   .withFailureHandler(onFailure)
+  //   .processData(spreadsheetUrl, sheetName, apiKey, parseInt(startRow), endRow ? parseInt(endRow) : null, systemPrompts, userPrompts);
 
+  // Demonstration only: Simulate the processing
   setTimeout(() => {
     onSuccess('처리가 완료되었습니다.');
   }, 2000); // Simulating processing time
