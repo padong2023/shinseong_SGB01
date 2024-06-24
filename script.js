@@ -5,6 +5,20 @@ let columnDescriptions = {
   columnD: "읽게 된 동기",
   columnE: "줄거리"
 };
+let jsonFileContent = null; // JSON 파일의 내용 저장
+
+// JSON 파일 업로드 핸들러
+function handleFileUpload(event) {
+  const file = event.target.files[0];
+  const reader = new FileReader();
+
+  reader.onload = function(e) {
+    jsonFileContent = e.target.result; // JSON 파일의 내용을 저장
+    alert("JSON 파일이 업로드되었습니다.");
+  };
+
+  reader.readAsText(file);
+}
 
 // 시스템 프롬프트 추가
 function addSystemPrompt() {
@@ -29,7 +43,7 @@ function generateTemplate() {
   };
 
   userPrompts.push(userPrompt);
-  updatePromptList('userPromptList', userPrompts);
+  updatePromptList('userPromptList', userPrompt);
 }
 
 // 프롬프트 리스트 업데이트
@@ -110,13 +124,18 @@ function startProcess() {
   var startRow = document.getElementById('startRow').value;
   var endRow = document.getElementById('endRow').value;
 
+  if (!jsonFileContent) {
+    alert("JSON 파일을 업로드해주세요.");
+    return;
+  }
+
   document.getElementById('progressBar').style.display = 'block';
   document.getElementById('status').innerHTML = '처리 중...';
 
   google.script.run
     .withSuccessHandler(onSuccess)
     .withFailureHandler(onFailure)
-    .processData(spreadsheetUrl, sheetName, apiKey, parseInt(startRow), endRow ? parseInt(endRow) : null, systemPrompts, userPrompts);
+    .processData(spreadsheetUrl, sheetName, apiKey, jsonFileContent, parseInt(startRow), endRow ? parseInt(endRow) : null, systemPrompts, userPrompts);
 }
 
 // 처리 성공 핸들러

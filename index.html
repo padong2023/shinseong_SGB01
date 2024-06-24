@@ -9,7 +9,8 @@
       padding: 20px;
       background-color: #f9f9f9;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      align-items: center;
     }
     .container {
       max-width: 800px;
@@ -21,6 +22,7 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       margin-bottom: 20px;
       padding: 20px;
+      width: 100%;
     }
     .card h3 {
       margin-top: 0;
@@ -132,6 +134,8 @@
       <input type="text" id="spreadsheetUrl" placeholder="구글 스프레드시트 URL" class="input-field">
       <input type="text" id="sheetName" placeholder="시트 이름" class="input-field">
       <input type="password" id="apiKey" placeholder="OpenAI API 키" class="input-field">
+      <input type="file" id="jsonFileInput" class="file-input" accept=".json" onchange="handleFileUpload(event)">
+      <label for="jsonFileInput" class="file-label">JSON 파일 업로드</label>
     </div>
     
     <div class="card">
