@@ -8,12 +8,22 @@
       margin: 0;
       padding: 20px;
       background-color: #f9f9f9;
+      display: flex;
+      justify-content: center;
     }
-    h2 {
-      color: #4a90e2;
+    .container {
+      max-width: 800px;
+      width: 100%;
     }
-    h3 {
-      margin-top: 30px;
+    .card {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      padding: 20px;
+    }
+    .card h3 {
+      margin-top: 0;
       color: #333;
     }
     .input-field, .input-area {
@@ -33,9 +43,15 @@
       cursor: pointer;
       font-size: 16px;
       margin-top: 10px;
+      margin-right: 10px;
     }
     .button:hover {
       background-color: #357ab8;
+    }
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
     }
     .prompt-list {
       max-height: 200px;
@@ -88,52 +104,70 @@
   </style>
 </head>
 <body>
-  <h2>공감사색 AI 처리</h2>
-  
-  <h3>설정</h3>
-  <input type="text" id="spreadsheetUrl" placeholder="구글 스프레드시트 URL" class="input-field">
-  <input type="text" id="sheetName" placeholder="시트 이름" class="input-field">
-  <input type="password" id="apiKey" placeholder="OpenAI API 키" class="input-field">
-  
-  <h3>처리 범위</h3>
-  <input type="number" id="startRow" placeholder="시작 행" value="2" class="input-field">
-  <input type="number" id="endRow" placeholder="끝 행 (학생수 + 1)" class="input-field">
-  
-  <h3>시스템 프롬프트</h3>
-  <input type="text" id="systemPromptInput" placeholder="시스템 프롬프트 입력" class="input-field">
-  <button class="button" onclick="addSystemPrompt()">추가</button>
-  <div id="systemPromptList" class="prompt-list"></div>
-  
-  <h3>사용자 프롬프트 템플릿</h3>
-  <div id="columnDescriptions">
-    <!-- 기본 열 설명들 -->
-    <div class="column-description">
-      <input type="text" id="columnC" placeholder="C열 설명 (예: 독서 활동)" class="input-field">
-      <button class="button" style="background-color: #e74c3c;" onclick="removeColumn('columnC')">삭제</button>
+  <div class="container">
+    <h2>공감사색 AI 처리</h2>
+
+    <div class="card">
+      <h3>설정</h3>
+      <input type="text" id="spreadsheetUrl" placeholder="구글 스프레드시트 URL" class="input-field">
+      <input type="text" id="sheetName" placeholder="시트 이름" class="input-field">
+      <input type="password" id="apiKey" placeholder="OpenAI API 키" class="input-field">
     </div>
-    <div class="column-description">
-      <input type="text" id="columnD" placeholder="D열 설명 (예: 읽게 된 동기)" class="input-field">
-      <button class="button" style="background-color: #e74c3c;" onclick="removeColumn('columnD')">삭제</button>
+    
+    <div class="card">
+      <h3>처리 범위</h3>
+      <input type="number" id="startRow" placeholder="시작 행" value="2" class="input-field">
+      <input type="number" id="endRow" placeholder="끝 행 (비워두면 마지막 행까지)" class="input-field">
     </div>
-    <div class="column-description">
-      <input type="text" id="columnE" placeholder="E열 설명 (예: 줄거리)" class="input-field">
-      <button class="button" style="background-color: #e74c3c;" onclick="removeColumn('columnE')">삭제</button>
+
+    <div class="card">
+      <h3>시스템 프롬프트</h3>
+      <input type="text" id="systemPromptInput" placeholder="시스템 프롬프트 입력" class="input-field">
+      <div class="button-group">
+        <button class="button" onclick="addSystemPrompt()">추가</button>
+        <button class="button" onclick="saveSystemPrompts()">시스템 프롬프트 저장</button>
+        <button class="button" onclick="loadSystemPrompts()">시스템 프롬프트 불러오기</button>
+      </div>
+      <div id="systemPromptList" class="prompt-list"></div>
     </div>
-    <!-- 여기에 추가적인 열이 추가될 수 있습니다 -->
+
+    <div class="card">
+      <h3>사용자 프롬프트 템플릿</h3>
+      <div id="columnDescriptions">
+        <!-- 기본 열 설명들 -->
+        <div class="column-description">
+          <input type="text" id="columnC" placeholder="C열 설명 (예: 독서 활동)" class="input-field">
+          <button class="button" style="background-color: #e74c3c;" onclick="removeColumn('columnC')">삭제</button>
+        </div>
+        <div class="column-description">
+          <input type="text" id="columnD" placeholder="D열 설명 (예: 읽게 된 동기)" class="input-field">
+          <button class="button" style="background-color: #e74c3c;" onclick="removeColumn('columnD')">삭제</button>
+        </div>
+        <div class="column-description">
+          <input type="text" id="columnE" placeholder="E열 설명 (예: 줄거리)" class="input-field">
+          <button class="button" style="background-color: #e74c3c;" onclick="removeColumn('columnE')">삭제</button>
+        </div>
+        <!-- 여기에 추가적인 열이 추가될 수 있습니다 -->
+      </div>
+      <input type="text" id="newColumnName" placeholder="새 열 이름 (예: columnF)" class="input-field">
+      <input type="text" id="newColumnDescription" placeholder="새 열 설명 (예: 감상과 깨달은 점)" class="input-field">
+      <div class="button-group">
+        <button class="button" onclick="addColumn()">열 추가</button>
+        <button class="button" onclick="generateTemplate()">프롬프트 템플릿 생성</button>
+        <button class="button" onclick="saveUserPrompts()">사용자 프롬프트 템플릿 저장</button>
+        <button class="button" onclick="loadUserPrompts()">사용자 프롬프트 템플릿 불러오기</button>
+      </div>
+      <div id="userPromptList" class="prompt-list"></div>
+    </div>
+
+    <div class="card">
+      <button class="button" onclick="startProcess()">처리 시작</button>
+      <div id="progressBar" class="progress-bar">
+        <span id="progressBarFill" class="progress-bar-fill" style="width: 0%;">0%</span>
+      </div>
+      <p id="status"></p>
+    </div>
   </div>
-  <input type="text" id="newColumnName" placeholder="새 열 이름 (예: columnF)" class="input-field">
-  <input type="text" id="newColumnDescription" placeholder="새 열 설명 (예: 감상과 깨달은 점)" class="input-field">
-  <button class="button" onclick="addColumn()">열 추가</button>
-  
-  <button class="button" onclick="generateTemplate()">프롬프트 템플릿 생성</button>
-  <div id="userPromptList" class="prompt-list"></div>
-  
-  <button class="button" onclick="startProcess()">처리 시작</button>
-  
-  <div id="progressBar" class="progress-bar">
-    <span id="progressBarFill" class="progress-bar-fill" style="width: 0%;">0%</span>
-  </div>
-  <p id="status"></p>
 
   <!-- JavaScript 파일 로드 -->
   <script src="script.js"></script>

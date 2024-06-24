@@ -120,3 +120,61 @@ function updateProgressBar(progress) {
   fill.style.width = progress + '%';
   fill.innerHTML = Math.round(progress) + '%';
 }
+
+// 시스템 프롬프트 저장 기능
+function saveSystemPrompts() {
+  localStorage.setItem('savedSystemPrompts', JSON.stringify(systemPrompts));
+  alert('시스템 프롬프트가 저장되었습니다.');
+}
+
+// 시스템 프롬프트 불러오기 기능
+function loadSystemPrompts() {
+  const savedSystemPrompts = localStorage.getItem('savedSystemPrompts');
+  if (savedSystemPrompts) {
+    systemPrompts = JSON.parse(savedSystemPrompts);
+    updatePromptList('systemPromptList', systemPrompts);
+    alert('시스템 프롬프트가 불러와졌습니다.');
+  } else {
+    alert('저장된 시스템 프롬프트가 없습니다.');
+  }
+}
+
+// 사용자 프롬프트 템플릿 저장 기능
+function saveUserPrompts() {
+  const data = {
+    userPrompts: userPrompts,
+    columnDescriptions: columnDescriptions
+  };
+  localStorage.setItem('savedUserPrompts', JSON.stringify(data));
+  alert('사용자 프롬프트 템플릿이 저장되었습니다.');
+}
+
+// 사용자 프롬프트 템플릿 불러오기 기능
+function loadUserPrompts() {
+  const savedData = localStorage.getItem('savedUserPrompts');
+  if (savedData) {
+    const data = JSON.parse(savedData);
+    userPrompts = data.userPrompts || [];
+    columnDescriptions = data.columnDescriptions || {};
+    updatePromptList('userPromptList', userPrompts);
+    updateColumnDescriptions();
+    alert('사용자 프롬프트 템플릿이 불러와졌습니다.');
+  } else {
+    alert('저장된 사용자 프롬프트 템플릿이 없습니다.');
+  }
+}
+
+// 컬럼 설명을 업데이트하여 불러온 후 UI에 반영
+function updateColumnDescriptions() {
+  const columnDescriptionsDiv = document.getElementById('columnDescriptions');
+  columnDescriptionsDiv.innerHTML = '';
+  for (const [columnName, columnDesc] of Object.entries(columnDescriptions)) {
+    const columnDiv = document.createElement('div');
+    columnDiv.className = 'column-description';
+    columnDiv.innerHTML = `
+      <input type="text" id="${columnName}" value="${columnDesc}" class="input-field">
+      <button class="button" style="background-color: #e74c3c;" onclick="removeColumn('${columnName}')">삭제</button>
+    `;
+    columnDescriptionsDiv.appendChild(columnDiv);
+  }
+}
