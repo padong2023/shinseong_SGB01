@@ -6,6 +6,7 @@ let columnDescriptions = {
   columnE: "줄거리"
 };
 
+// 시스템 프롬프트 추가
 function addSystemPrompt() {
   const input = document.getElementById('systemPromptInput');
   if (input.value.trim() !== '') {
@@ -15,6 +16,7 @@ function addSystemPrompt() {
   }
 }
 
+// 프롬프트 템플릿 생성
 function generateTemplate() {
   const templateParts = Object.keys(columnDescriptions).map(key => {
     return `${columnDescriptions[key]}: \${${key}}`;
@@ -30,6 +32,7 @@ function generateTemplate() {
   updatePromptList('userPromptList', userPrompts);
 }
 
+// 프롬프트 리스트 업데이트
 function updatePromptList(listId, prompts) {
   const list = document.getElementById(listId);
   if (listId === 'userPromptList') {
@@ -43,6 +46,7 @@ function updatePromptList(listId, prompts) {
   }
 }
 
+// 프롬프트 삭제
 function removePrompt(listId, index) {
   if (listId === 'systemPromptList') {
     systemPrompts.splice(index, 1);
@@ -53,6 +57,7 @@ function removePrompt(listId, index) {
   }
 }
 
+// 새 열 추가
 function addColumn() {
   const newColumnName = document.getElementById('newColumnName').value.trim();
   const newColumnDescription = document.getElementById('newColumnDescription').value.trim();
@@ -78,104 +83,118 @@ function addColumn() {
   }
 }
 
+// 열 이름 형식화
 function formatColumnName(name) {
   // "F" -> "columnF"
   return name.match(/^column/i) ? name : `column${name.toUpperCase()}`;
 }
 
+// 새 열 이름 자동 변환
 function updateNewColumnName() {
   const input = document.getElementById('newColumnName');
   input.value = formatColumnName(input.value);
 }
 
+// 열 삭제
 function removeColumn(columnName) {
   delete columnDescriptions[columnName];
   const columnElement = document.getElementById(columnName).parentElement;
   document.getElementById('columnDescriptions').removeChild(columnElement);
 }
 
+// 스프레드시트 데이터 처리 시작
 function startProcess() {
   var spreadsheetUrl = document.getElementById('spreadsheetUrl').value;
   var sheetName = document.getElementById('sheetName').value;
   var apiKey = document.getElementById('apiKey').value;
   var startRow = document.getElementById('startRow').value;
   var endRow = document.getElementById('endRow').value;
-  
+
   document.getElementById('progressBar').style.display = 'block';
   document.getElementById('status').innerHTML = '처리 중...';
-  
-  // Google Apps Script와 연동하는 부분
-  // google.script.run
-  //   .withSuccessHandler(onSuccess)
-  //   .withFailureHandler(onFailure)
-  //   .processData(spreadsheetUrl, sheetName, apiKey, parseInt(startRow), endRow ? parseInt(endRow) : null, systemPrompts, userPrompts);
 
-  // Demonstration only: Simulate the processing
-  setTimeout(() => {
-    onSuccess('처리가 완료되었습니다.');
-  }, 2000); // Simulating processing time
+  google.script.run
+    .withSuccessHandler(onSuccess)
+    .withFailureHandler(onFailure)
+    .processData(spreadsheetUrl, sheetName, apiKey, parseInt(startRow), endRow ? parseInt(endRow) : null, systemPrompts, userPrompts);
 }
 
+// 처리 성공 핸들러
 function onSuccess(result) {
   document.getElementById('status').innerHTML = result;
   document.getElementById('progressBarFill').style.width = '100%';
   document.getElementById('progressBarFill').innerHTML = '완료';
 }
 
+// 처리 실패 핸들러
 function onFailure(error) {
   document.getElementById('status').innerHTML = '오류: ' + error.message;
 }
 
+// 진행 상황 업데이트
 function updateProgressBar(progress) {
   var fill = document.getElementById('progressBarFill');
   fill.style.width = progress + '%';
   fill.innerHTML = Math.round(progress) + '%';
 }
 
-// 시스템 프롬프트 저장 기능
+// 시스템 프롬프트 저장
 function saveSystemPrompts() {
-  localStorage.setItem('savedSystemPrompts', JSON.stringify(systemPrompts));
-  alert('시스템 프롬프트가 저장되었습니다.');
+  const fileName = document.getElementById('saveSystemPromptName').value || 'system_prompts';
+  const data = JSON.stringify(systemPrompts, null, 2);
+  downloadFile(data, `${fileName}.json`);
 }
 
-// 시스템 프롬프트 불러오기 기능
-function loadSystemPrompts() {
-  const savedSystemPrompts = localStorage.getItem('savedSystemPrompts');
-  if (savedSystemPrompts) {
-    systemPrompts = JSON.parse(savedSystemPrompts);
-    updatePromptList('systemPromptList', systemPrompts);
-    alert('시스템 프롬프트가 불러와졌습니다.');
-  } else {
-    alert('저장된 시스템 프롬프트가 없습니다.');
+// 시스템 프롬프트 불러오기
+function loadSystemPrompts(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      systemPrompts = JSON.parse(e.target.result);
+      updatePromptList('systemPromptList', systemPrompts);
+      alert('시스템 프롬프트가 불러와졌습니다.');
+    };
+    reader.readAsText(file);
   }
 }
 
-// 사용자 프롬프트 템플릿 저장 기능
+// 사용자 프롬프트 템플릿 저장
 function saveUserPrompts() {
-  const data = {
-    userPrompts: userPrompts,
-    columnDescriptions: columnDescriptions
-  };
-  localStorage.setItem('savedUserPrompts', JSON.stringify(data));
-  alert('사용자 프롬프트 템플릿이 저장되었습니다.');
+  const fileName = document.getElementById('saveUserPromptName').value || 'user_prompts';
+  const data = JSON.stringify({ userPrompts, columnDescriptions }, null, 2);
+  downloadFile(data, `${fileName}.json`);
 }
 
-// 사용자 프롬프트 템플릿 불러오기 기능
-function loadUserPrompts() {
-  const savedData = localStorage.getItem('savedUserPrompts');
-  if (savedData) {
-    const data = JSON.parse(savedData);
-    userPrompts = data.userPrompts || [];
-    columnDescriptions = data.columnDescriptions || {};
-    updatePromptList('userPromptList', userPrompts);
-    updateColumnDescriptions();
-    alert('사용자 프롬프트 템플릿이 불러와졌습니다.');
-  } else {
-    alert('저장된 사용자 프롬프트 템플릿이 없습니다.');
+// 사용자 프롬프트 템플릿 불러오기
+function loadUserPrompts(event) {
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const data = JSON.parse(e.target.result);
+      userPrompts = data.userPrompts || [];
+      columnDescriptions = data.columnDescriptions || {};
+      updatePromptList('userPromptList', userPrompts);
+      updateColumnDescriptions();
+      alert('사용자 프롬프트 템플릿이 불러와졌습니다.');
+    };
+    reader.readAsText(file);
   }
 }
 
-// 컬럼 설명을 업데이트하여 불러온 후 UI에 반영
+// 파일 다운로드
+function downloadFile(content, fileName) {
+  const blob = new Blob([content], { type: 'application/json' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = fileName;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// 열 설명을 업데이트하여 UI에 반영
 function updateColumnDescriptions() {
   const columnDescriptionsDiv = document.getElementById('columnDescriptions');
   columnDescriptionsDiv.innerHTML = '';

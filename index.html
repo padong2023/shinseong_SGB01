@@ -109,6 +109,18 @@
     .template-section h3 {
       color: #4a90e2;
     }
+    .file-input {
+      display: none;
+    }
+    .file-label {
+      background-color: #4a90e2;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -133,8 +145,10 @@
       <input type="text" id="systemPromptInput" placeholder="시스템 프롬프트 입력" class="input-field">
       <div class="button-group">
         <button class="button" onclick="addSystemPrompt()">추가</button>
-        <button class="button" onclick="saveSystemPrompts()">시스템 프롬프트 저장</button>
-        <button class="button" onclick="loadSystemPrompts()">시스템 프롬프트 불러오기</button>
+        <input type="text" id="saveSystemPromptName" placeholder="파일 이름 (시스템 프롬프트)" class="input-field">
+        <button class="button" onclick="saveSystemPrompts()">저장</button>
+        <input type="file" id="loadSystemPromptFile" class="file-input" accept=".json" onchange="loadSystemPrompts(event)">
+        <label for="loadSystemPromptFile" class="file-label">불러오기</label>
       </div>
       <div id="systemPromptList" class="prompt-list"></div>
     </div>
@@ -161,15 +175,17 @@
       <input type="text" id="newColumnDescription" placeholder="새 열 설명 (예: 감상과 깨달은 점)" class="input-field">
       <div class="button-group">
         <button class="button" onclick="addColumn()">열 추가</button>
-        <button class="button" onclick="saveUserPrompts()">사용자 프롬프트 템플릿 저장</button>
-        <button class="button" onclick="loadUserPrompts()">사용자 프롬프트 템플릿 불러오기</button>
+        <input type="text" id="saveUserPromptName" placeholder="파일 이름 (사용자 프롬프트)" class="input-field">
+        <button class="button" onclick="saveUserPrompts()">저장</button>
+        <input type="file" id="loadUserPromptFile" class="file-input" accept=".json" onchange="loadUserPrompts(event)">
+        <label for="loadUserPromptFile" class="file-label">불러오기</label>
       </div>
+      <div id="userPromptList" class="prompt-list"></div>
     </div>
 
     <div class="card template-section">
       <h3>프롬프트 템플릿 생성</h3>
       <button class="button" onclick="generateTemplate()">프롬프트 템플릿 생성</button>
-      <div id="userPromptList" class="prompt-list"></div>
     </div>
 
     <div class="card">
