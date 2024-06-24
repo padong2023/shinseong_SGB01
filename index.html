@@ -101,6 +101,14 @@
       line-height: 22px;
       font-weight: bold;
     }
+    .template-section {
+      margin-top: 20px;
+      border-top: 2px solid #4a90e2;
+      padding-top: 20px;
+    }
+    .template-section h3 {
+      color: #4a90e2;
+    }
   </style>
 </head>
 <body>
@@ -149,14 +157,18 @@
         </div>
         <!-- 여기에 추가적인 열이 추가될 수 있습니다 -->
       </div>
-      <input type="text" id="newColumnName" placeholder="새 열 이름 (예: columnF)" class="input-field">
+      <input type="text" id="newColumnName" placeholder="새 열 이름 (예: F)" class="input-field" oninput="updateNewColumnName()">
       <input type="text" id="newColumnDescription" placeholder="새 열 설명 (예: 감상과 깨달은 점)" class="input-field">
       <div class="button-group">
         <button class="button" onclick="addColumn()">열 추가</button>
-        <button class="button" onclick="generateTemplate()">프롬프트 템플릿 생성</button>
         <button class="button" onclick="saveUserPrompts()">사용자 프롬프트 템플릿 저장</button>
         <button class="button" onclick="loadUserPrompts()">사용자 프롬프트 템플릿 불러오기</button>
       </div>
+    </div>
+
+    <div class="card template-section">
+      <h3>프롬프트 템플릿 생성</h3>
+      <button class="button" onclick="generateTemplate()">프롬프트 템플릿 생성</button>
       <div id="userPromptList" class="prompt-list"></div>
     </div>
 

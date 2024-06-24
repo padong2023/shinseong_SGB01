@@ -58,13 +58,14 @@ function addColumn() {
   const newColumnDescription = document.getElementById('newColumnDescription').value.trim();
   
   if (newColumnName && newColumnDescription) {
-    if (!columnDescriptions[newColumnName]) { // 중복된 열 이름을 방지
-      columnDescriptions[newColumnName] = newColumnDescription;
+    const formattedColumnName = formatColumnName(newColumnName);
+    if (!columnDescriptions[formattedColumnName]) { // 중복된 열 이름을 방지
+      columnDescriptions[formattedColumnName] = newColumnDescription;
       const columnDiv = document.createElement('div');
       columnDiv.className = 'column-description';
       columnDiv.innerHTML = `
-        <input type="text" id="${newColumnName}" value="${newColumnDescription}" class="input-field">
-        <button class="button" style="background-color: #e74c3c;" onclick="removeColumn('${newColumnName}')">삭제</button>
+        <input type="text" id="${formattedColumnName}" value="${newColumnDescription}" class="input-field">
+        <button class="button" style="background-color: #e74c3c;" onclick="removeColumn('${formattedColumnName}')">삭제</button>
       `;
       document.getElementById('columnDescriptions').appendChild(columnDiv);
       document.getElementById('newColumnName').value = '';
@@ -75,6 +76,16 @@ function addColumn() {
   } else {
     alert('새 열 이름과 설명을 입력하세요.');
   }
+}
+
+function formatColumnName(name) {
+  // "F" -> "columnF"
+  return name.match(/^column/i) ? name : `column${name.toUpperCase()}`;
+}
+
+function updateNewColumnName() {
+  const input = document.getElementById('newColumnName');
+  input.value = formatColumnName(input.value);
 }
 
 function removeColumn(columnName) {
